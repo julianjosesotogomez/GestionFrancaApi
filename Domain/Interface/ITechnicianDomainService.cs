@@ -6,8 +6,10 @@ namespace GestionFrancaApi.Domain.Interface
 {
     public interface ITechnicianDomainService
     {
-        public List<Technician>GetListTechnicians();
-        public Technician GetTechnician(Guid IdTechnician);
+        public List<TechnicianDto> GetListTechnicians();
+        public TechnicianDto GetTechnician(Guid IdTechnician);
         public ResponseEndPointDTO<bool> CreateTechnician(RequestTechnicianDto requestCreateTechnicianDto);
+        public ResponseEndPointDTO<bool> UpdateTechnician(RequestUpdateTechnicianDto requestUpdateTechnicianDto);
+        public ResponseEndPointDTO<bool> DeleteTechnician(Guid IdTechnician);
     }
 }

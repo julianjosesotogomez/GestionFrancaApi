@@ -5,6 +5,7 @@ using GestionFrancaApi.DTO.TechnicianDTO;
 using GestionFrancaApi.DTOs;
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace GestionFrancaApi.Domain
 {
@@ -20,13 +21,77 @@ namespace GestionFrancaApi.Domain
         }
         #endregion
         #region Methods
-        public List<Technician> GetListTechnicians()
+        public List<TechnicianDto> GetListTechnicians()
         {
-            return _context.Technician.ToList();
+            var listTechnician = _context.Technician.AsNoTracking().ToList();
+
+            List<TechnicianDto> list = new List<TechnicianDto>();
+            
+            foreach (var item in listTechnician)
+            {
+                var technicianData = new TechnicianDto();
+                technicianData.TechnicianInfo = new List<TechnicianInfoList>();
+
+                technicianData.IdTechnician = item.IdTechnician;
+                technicianData.Code = item.Code;
+                technicianData.Name = item.Name;
+                technicianData.Salary = item.Salary;
+
+                var listRelation = _context.TechnicianItem.AsNoTracking()
+                                                          .Include(x=>x.IdBranchOfficeNavigation)
+                                                          .Include(x=>x.IdItemNavigation)
+                                                          .Where(x=>x.IdTechnician == item.IdTechnician).ToList();
+
+                foreach (var itemA in listRelation )
+                {
+                    var dataRelation = new TechnicianInfoList();
+                    dataRelation.IdTechnicianItem = itemA.IdTechnicianItem;
+                    dataRelation.NameBranchOffice = itemA.IdBranchOfficeNavigation.Name;
+                    dataRelation.NameItem = itemA.IdItemNavigation.NameItem;
+                    dataRelation.ItemQuantity = itemA.ItemQuantity;
+
+                    technicianData.TechnicianInfo.Add(dataRelation);
+                }
+
+                list.Add(technicianData);
+            }
+            return list;
         }
-        public Technician GetTechnician(Guid IdTechnician) 
+        public TechnicianDto GetTechnician(Guid IdTechnician) 
         {
-            return _context.Technician.AsNoTracking().FirstOrDefault(x => x.IdTechnician == IdTechnician);
+            var data = _context.Technician.AsNoTracking().FirstOrDefault(x => x.IdTechnician == IdTechnician);
+
+            if (data != null)
+            {
+                var technicianData = new TechnicianDto();
+                technicianData.TechnicianInfo = new List<TechnicianInfoList>();
+
+                technicianData.IdTechnician = data.IdTechnician;
+                technicianData.Code = data.Code;
+                technicianData.Name = data.Name;
+                technicianData.Salary = data.Salary;
+
+                var listRelation = _context.TechnicianItem.AsNoTracking()
+                                                          .Include(x => x.IdBranchOfficeNavigation)
+                                                          .Include(x => x.IdItemNavigation)
+                                                          .Where(x => x.IdTechnician == data.IdTechnician).ToList();
+
+                foreach (var itemA in listRelation)
+                {
+                    var dataRelation = new TechnicianInfoList();
+                    dataRelation.IdTechnicianItem = itemA.IdTechnicianItem;
+                    dataRelation.NameBranchOffice = itemA.IdBranchOfficeNavigation.Name;
+                    dataRelation.NameItem = itemA.IdItemNavigation.NameItem;
+                    dataRelation.ItemQuantity = itemA.ItemQuantity;
+
+                    technicianData.TechnicianInfo.Add(dataRelation);
+                }
+                return technicianData;
+            }
+
+            return null;
+
+
         }
         public ResponseEndPointDTO<bool> CreateTechnician(RequestTechnicianDto requestCreateTechnicianDto)
         {
@@ -64,8 +129,52 @@ namespace GestionFrancaApi.Domain
 
                         _context.TechnicianItem.Add(newRelation);
                     }
+                    _context.SaveChanges();
                 }
+
+            }
+            return response;
+        }
+
+        public ResponseEndPointDTO<bool> UpdateTechnician(RequestUpdateTechnicianDto requestUpdateTechnicianDto)
+        {
+            ResponseEndPointDTO<bool> response = new ResponseEndPointDTO<bool>();
+
+            var technician = _context.Technician.AsNoTracking().FirstOrDefault(x=>x.IdTechnician == requestUpdateTechnicianDto.IdTechnician);
+            if (technician != null) 
+            {
+                Technician technicianUpdate = new Technician();
+                technicianUpdate.IdTechnician = requestUpdateTechnicianDto.IdTechnician;
+                technicianUpdate.Code = requestUpdateTechnicianDto.Code is null? technician.Code: requestUpdateTechnicianDto.Code;
+                technicianUpdate.Name = requestUpdateTechnicianDto.Name is null? technician.Name: requestUpdateTechnicianDto.Name;
+                technicianUpdate.Salary=requestUpdateTechnicianDto.Salary is null? technician.Salary: requestUpdateTechnicianDto.Salary;
+
+                _context.Technician.Update(technicianUpdate);
                 _context.SaveChanges();
+            }
+            else
+            {
+                response.ResponseMessage($"No se encuentra informacion del Tecnico", false);
+            }
+            return response;
+        }
+
+        public ResponseEndPointDTO<bool> DeleteTechnician(Guid IdTechnician)
+        {
+            ResponseEndPointDTO<bool> response = new ResponseEndPointDTO<bool>();
+
+            var technician = _context.Technician.AsNoTracking().FirstOrDefault(x => x.IdTechnician == IdTechnician);
+            if (technician != null)
+            {
+                var technicianItem = _context.TechnicianItem.AsNoTracking().Where(x => x.IdTechnician == IdTechnician).ToList();
+
+                _context.TechnicianItem.RemoveRange(technicianItem);
+                _context.Technician.Remove(technician);
+                _context.SaveChanges();
+            }
+            else
+            {
+                response.ResponseMessage($"No se encuentra informacion del Tecnico", false);
             }
             return response;
         }

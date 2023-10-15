@@ -18,7 +18,6 @@ namespace GestionFrancaApi.Application
         #endregion
         #region Const
         private const string PATTERN_CODE = "^[a-zA-Z0-9]*$";
-        private const string PATTERN_SALARY = @"^\d{8}.\d{2}$";
         #endregion
         #region Builder
         public TechnicianApplication(ITechnicianDomainService technicianDomainService, IMapper mapper)
@@ -56,15 +55,15 @@ namespace GestionFrancaApi.Application
             ResponseEndPointDTO<TechnicianDto> response = new ResponseEndPointDTO<TechnicianDto>();
             try
             {
-                var listData = _technicianDomainService.GetListTechnicians();
-                if (!listData.Any())
+                var data = _technicianDomainService.GetTechnician(IdTechnician);
+                if (data == null)
                 {
                     response.ResponseMessage("No hay registro del tecnico en BD", false);
                 }
                 else
                 {
-                    var resultList = _mapper.Map<TechnicianDto>(listData);//Se realiza mapeo directamente a la entidad 
-                    response.Result = resultList;
+     
+                    response.Result = data;
                 }
             }
             catch (Exception ex)
@@ -79,7 +78,7 @@ namespace GestionFrancaApi.Application
             ResponseEndPointDTO<bool> response = new ResponseEndPointDTO<bool>();
             try
             {
-                var validateData = ValidateData(requestCreateTechnicianDto);
+                var validateData = ValidateData(requestCreateTechnicianDto.Code);
                 if (validateData != null)
                 {
                     response.ResponseMessage(validateData, false);
@@ -87,17 +86,15 @@ namespace GestionFrancaApi.Application
                 else
                 {
                     var resultCreate = _technicianDomainService.CreateTechnician(requestCreateTechnicianDto);
-                    if (!resultCreate.Result)
+                    if (!resultCreate.Successful)
                     {
-                        response.ResponseMessage("No hay registro del tecnico en BD", false);
+                        response.ResponseMessage(resultCreate.Message,false);
                     }
                     else
                     {
-
                         response.Result = resultCreate.Result;
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -105,6 +102,58 @@ namespace GestionFrancaApi.Application
             }
             return response;
         }
+        public ResponseEndPointDTO<bool> UpdateTechnician(RequestUpdateTechnicianDto requestUpdateTechnicianDto)
+        {
+            ResponseEndPointDTO<bool> response = new ResponseEndPointDTO<bool>();
+            try
+            {
+                var validateData = ValidateData(requestUpdateTechnicianDto.Code);
+                if (validateData != null)
+                {
+                    response.ResponseMessage(validateData, false);
+                }
+                else
+                {
+                    var resultUpdate = _technicianDomainService.UpdateTechnician(requestUpdateTechnicianDto);
+                    if (!resultUpdate.Successful)
+                    {
+                        response.ResponseMessage(resultUpdate.Message, false);
+                    }
+                    else
+                    {
+                        response.Result = resultUpdate.Result;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ResponseMessage("Error en el sistema", false, ex.Message);
+            }
+            return response;
+        }
+
+        public ResponseEndPointDTO<bool> DeleteTechnician(Guid IdTechnician)
+        {
+            ResponseEndPointDTO<bool> response = new ResponseEndPointDTO<bool>();
+            try
+            {
+                var resultUpdate = _technicianDomainService.DeleteTechnician(IdTechnician);
+                if (!resultUpdate.Successful)
+                {
+                    response.ResponseMessage(resultUpdate.Message, false);
+                }
+                else
+                {
+                    response.Result = resultUpdate.Result;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ResponseMessage("Error en el sistema", false, ex.Message);
+            }
+            return response;
+        }
+
         #endregion
         #region Private Method
         /// <summary>
@@ -112,14 +161,13 @@ namespace GestionFrancaApi.Application
         /// </summary>
         /// <param name="partido"></param>
         /// <returns></returns>
-        private string ValidateData(RequestTechnicianDto requestTechnicianDto)
+        private string ValidateData(string code)
         {
             //Validacion de Code 
-            if (!Regex.IsMatch(requestTechnicianDto.Code, PATTERN_CODE))
-                return $"El formato del codigo ingresado {requestTechnicianDto.Code} no es valido";
-            //Vaidacion de salary
-            if (!Regex.IsMatch(requestTechnicianDto.Salary.ToString("0.00"), PATTERN_SALARY))
-                return $"El formato de Salry para el valor {requestTechnicianDto.Salary} es incorrecto";
+            if (!Regex.IsMatch(code, PATTERN_CODE))
+                return $"El formato del codigo ingresado {code} no es valido";
+            
+            //Se pueden realizar mas validaciones si es necesario 
 
             return null;
         }

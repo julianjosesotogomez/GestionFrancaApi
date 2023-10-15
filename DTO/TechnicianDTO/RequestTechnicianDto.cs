@@ -15,7 +15,7 @@ namespace GestionFrancaApi.DTO.TechnicianDTO
         /// <summary>
         /// Salario del tecnico
         /// </summary>
-        public Decimal Salary { get; set; }
+        public decimal Salary { get; set; }
 
         /// <summary>
         /// Listado de los items a registrar

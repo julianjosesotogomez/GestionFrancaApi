@@ -37,6 +37,7 @@ namespace GestionFrancaApi.Controllers
         /// <summary>
         /// Servicio que me permite obtener información del tecnico registrado 
         /// </summary>
+        /// /// <param name="IdTechnician"></param>
         /// <returns>Información del tecnico en BD</returns>
         [HttpGet]
         [Route(nameof(TechnicianController.GetTechnician))]
@@ -48,6 +49,11 @@ namespace GestionFrancaApi.Controllers
             });
         }
 
+        /// <summary>
+        /// Creación del tecnico 
+        /// </summary>
+        /// <param name="requestCreateTechnicianDto"></param>
+        /// <returns>Validación de la creación</returns>
         [HttpPost]
         [Route(nameof(TechnicianController.CreateTechnician))]
         public async Task<ResponseEndPointDTO<bool>> CreateTechnician(RequestTechnicianDto requestCreateTechnicianDto)
@@ -57,6 +63,31 @@ namespace GestionFrancaApi.Controllers
                 return _technicianApplication.CreateTechnician(requestCreateTechnicianDto);
             });
         }
+
+        /// <summary>
+        /// Actualizacion de los datos del tecnico
+        /// </summary>
+        /// <param name="requestUpdateTechnicianDto"></param>
+        /// <returns>Validacion de la actualización</returns>
+        [HttpPut]
+        [Route(nameof(TechnicianController.UpdateTechnician))]
+        public async Task<ResponseEndPointDTO<bool>> UpdateTechnician(RequestUpdateTechnicianDto requestUpdateTechnicianDto)
+        {
+            return await Task.Run(() =>
+            {
+                return _technicianApplication.UpdateTechnician(requestUpdateTechnicianDto);
+            });
+        }
+
+        [HttpDelete]
+        [Route(nameof(TechnicianController.DeleteTechnician))]
+        public async Task<ResponseEndPointDTO<bool>>DeleteTechnician(Guid IdTechnician)
+        {
+            return await Task.Run(() =>
+            {
+                return _technicianApplication.DeleteTechnician(IdTechnician);
+            });
+        } 
         #endregion
     }
 }
