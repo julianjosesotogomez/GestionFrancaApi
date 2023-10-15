@@ -101,6 +101,7 @@ namespace GestionFrancaApi.Domain
             if (validateTechnician != null)
             {
                 response.ResponseMessage($"Ya se encuentra registrado un Candidato con el codigo {validateTechnician.Code}", false);
+                return response;
             }
             else
             {
@@ -112,9 +113,15 @@ namespace GestionFrancaApi.Domain
 
                 _context.Technician.Add(newTechnician);
 
-                if(!requestCreateTechnicianDto.ListItems.GroupBy(item => item.IdItem).All(group => group.Count() == 1))
+                if (!requestCreateTechnicianDto.ListItems.Any())
+                {
+                    response.ResponseMessage($"Para la creación del Técnico debe tener almenos un elemnto", false);
+                    return response;
+                }
+                else if (!requestCreateTechnicianDto.ListItems.GroupBy(item => item.IdItem).All(group => group.Count() == 1))
                 {
                     response.ResponseMessage($"Verifica que no se repitan los elementos para el Técnico", false);
+                    return response;
                 }
                 else
                 {
@@ -125,6 +132,13 @@ namespace GestionFrancaApi.Domain
                         newRelation.IdTechnician = newTechnician.IdTechnician;
                         newRelation.IdBranchOffice = item.IdBranchOffice;
                         newRelation.IdItem = item.IdItem;
+
+                        if(!(item.ItemQuantity >= 1 && item.ItemQuantity <= 10))
+                        {
+                            response.ResponseMessage($"Verifica que mínimo sea 1 cantidad y máximo 10 para el item {item.IdItem}", false);
+                            return response;
+                        }
+
                         newRelation.ItemQuantity = item.ItemQuantity;
 
                         _context.TechnicianItem.Add(newRelation);
