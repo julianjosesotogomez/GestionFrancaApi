@@ -68,6 +68,7 @@ namespace GestionFrancaApi.Controllers
         /// Actualizacion de los datos del tecnico
         /// </summary>
         /// <param name="requestUpdateTechnicianDto"></param>
+        /// <param name="idTechnician"></param>
         /// <returns>Validacion de la actualización</returns>
         [HttpPut("UpdateTechnician/{idTechnician}")]
         public async Task<ResponseEndPointDTO<bool>> UpdateTechnician(Guid idTechnician,[FromBody]RequestUpdateTechnicianDto requestUpdateTechnicianDto)
