@@ -156,10 +156,11 @@ namespace GestionFrancaApi.Domain
             if (technician != null) 
             {
                 Technician technicianUpdate = new Technician();
-                technicianUpdate.IdTechnician = requestUpdateTechnicianDto.IdTechnician;
+                technicianUpdate.IdTechnician = IdTechnician;
                 technicianUpdate.Code = requestUpdateTechnicianDto.Code is null? technician.Code: requestUpdateTechnicianDto.Code;
                 technicianUpdate.Name = requestUpdateTechnicianDto.Name is null? technician.Name: requestUpdateTechnicianDto.Name;
                 technicianUpdate.Salary=requestUpdateTechnicianDto.Salary is null? technician.Salary: requestUpdateTechnicianDto.Salary;
+
 
                 _context.Technician.Update(technicianUpdate);
                 _context.SaveChanges();
