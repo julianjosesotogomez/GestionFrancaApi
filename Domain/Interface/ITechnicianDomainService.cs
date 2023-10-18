@@ -9,7 +9,7 @@ namespace GestionFrancaApi.Domain.Interface
         public List<TechnicianDto> GetListTechnicians();
         public TechnicianDto GetTechnician(Guid IdTechnician);
         public ResponseEndPointDTO<bool> CreateTechnician(RequestTechnicianDto requestCreateTechnicianDto);
-        public ResponseEndPointDTO<bool> UpdateTechnician(RequestUpdateTechnicianDto requestUpdateTechnicianDto);
+        public ResponseEndPointDTO<bool> UpdateTechnician(Guid IdTechnician,RequestUpdateTechnicianDto requestUpdateTechnicianDto);
         public ResponseEndPointDTO<bool> DeleteTechnician(Guid IdTechnician);
     }
 }

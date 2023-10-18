@@ -69,18 +69,21 @@ namespace GestionFrancaApi.Controllers
         /// </summary>
         /// <param name="requestUpdateTechnicianDto"></param>
         /// <returns>Validacion de la actualización</returns>
-        [HttpPut]
-        [Route(nameof(TechnicianController.UpdateTechnician))]
-        public async Task<ResponseEndPointDTO<bool>> UpdateTechnician(RequestUpdateTechnicianDto requestUpdateTechnicianDto)
+        [HttpPut("UpdateTechnician/{idTechnician}")]
+        public async Task<ResponseEndPointDTO<bool>> UpdateTechnician(Guid idTechnician,[FromBody]RequestUpdateTechnicianDto requestUpdateTechnicianDto)
         {
             return await Task.Run(() =>
             {
-                return _technicianApplication.UpdateTechnician(requestUpdateTechnicianDto);
+                return _technicianApplication.UpdateTechnician(idTechnician, requestUpdateTechnicianDto);
             });
         }
 
-        [HttpDelete]
-        [Route(nameof(TechnicianController.DeleteTechnician))]
+        /// <summary>
+        /// Metodo de eliminacion de tecnico registrado 
+        /// </summary>
+        /// <param name="IdTechnician"></param>
+        /// <returns>Validacion de la eliminacion</returns>
+        [HttpDelete("DeleteTechnician/{idTechnician}")]
         public async Task<ResponseEndPointDTO<bool>>DeleteTechnician(Guid IdTechnician)
         {
             return await Task.Run(() =>

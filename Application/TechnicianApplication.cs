@@ -39,8 +39,7 @@ namespace GestionFrancaApi.Application
                 }
                 else
                 {
-                    var resultList = _mapper.Map<List<TechnicianDto>>(listData);//Se realiza mapeo directamente a la entidad 
-                    response.Result = resultList;
+                    response.Result = listData;
                 }
             }
             catch (Exception ex)
@@ -62,7 +61,6 @@ namespace GestionFrancaApi.Application
                 }
                 else
                 {
-     
                     response.Result = data;
                 }
             }
@@ -102,7 +100,7 @@ namespace GestionFrancaApi.Application
             }
             return response;
         }
-        public ResponseEndPointDTO<bool> UpdateTechnician(RequestUpdateTechnicianDto requestUpdateTechnicianDto)
+        public ResponseEndPointDTO<bool> UpdateTechnician(Guid IdTechnician,RequestUpdateTechnicianDto requestUpdateTechnicianDto)
         {
             ResponseEndPointDTO<bool> response = new ResponseEndPointDTO<bool>();
             try
@@ -114,7 +112,7 @@ namespace GestionFrancaApi.Application
                 }
                 else
                 {
-                    var resultUpdate = _technicianDomainService.UpdateTechnician(requestUpdateTechnicianDto);
+                    var resultUpdate = _technicianDomainService.UpdateTechnician(IdTechnician,requestUpdateTechnicianDto);
                     if (!resultUpdate.Successful)
                     {
                         response.ResponseMessage(resultUpdate.Message, false);
